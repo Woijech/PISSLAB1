@@ -96,28 +96,28 @@ class RubiksCube:
         return [row[::-1] for row in mat[::-1]]
 
     @staticmethod
-    def _get_col(face: Face, j: int) -> List[str]:
+    def _get_column(face: Face, col_index: int) -> List[str]:
         """
         Gets a column from a 3x3 matrix.
 
         Args:
             face (Face): The matrix to get the column from.
-            j (int): The column index.
+            col_index (int): The column index.
 
         Returns:
             List[str]: The column values.
         """
-        return [face[r][j] for r in range(3)]
+        return [face[row_index][col_index] for row_index in range(3)]
 
     @staticmethod
-    def _set_col(face: Face, j: int, col: Iterable[str]) -> None:
+    def _set_column(face: Face, col_index: int, column_values: Iterable[str]) -> None:
         """
         Sets a column in a 3x3 matrix.
 
         Args:
             face (Face): The matrix to set the column in.
-            j (int): The column index.
-            col (Iterable[str]): The values to set.
+            col_index (int): The column index.
+            column_values (Iterable[str]): The values to set.
 
         Returns:
             None
@@ -186,12 +186,12 @@ class RubiksCube:
         if len(rows) != 6 or any(len(x) != 9 for x in rows):
             raise ValueError("Invalid file format: expected 6 lines of 9 characters.")
         for name, flat in zip(self.ORDER, rows):
-            k = 0
+            flat_index = 0
             face = [[None] * 3 for _ in range(3)]
-            for r in range(3):
-                for c in range(3):
-                    face[r][c] = flat[k]
-                    k += 1
+            for row_index in range(3):
+                for col_index in range(3):
+                    face[row_index][col_index] = flat[flat_index]
+                    flat_index += 1
             self.faces[name] = face
 
     def __str__(self) -> str:
@@ -205,9 +205,9 @@ class RubiksCube:
         join = lambda row: "".join(row)
         pad = " " * 6
         lines: List[str] = []
-        for r in range(3): lines.append(pad + join(U[r]))
-        for r in range(3): lines.append(join(L[r]) + " " + join(F[r]) + " " + join(R[r]) + " " + join(B[r]))
-        for r in range(3): lines.append(pad + join(D[r]))
+        for row_index in range(3): lines.append(pad + join(U[row_index]))
+        for row_index in range(3): lines.append(join(L[row_index]) + " " + join(F[row_index]) + " " + join(R[row_index]) + " " + join(B[row_index]))
+        for row_index in range(3): lines.append(pad + join(D[row_index]))
         return "\n".join(lines)
 
     # ------------------------------------------------------------------ #
@@ -223,7 +223,7 @@ class RubiksCube:
         """
         for face in self.faces.values():
             c = face[0][0]
-            for r in range(3):
+            for row_index in range(3):
                 for j in range(3):
                     if face[r][j] != c:
                         return False
@@ -307,26 +307,26 @@ class RubiksCube:
 
         U, F, D, B = self.faces["U"], self.faces["F"], self.faces["D"], self.faces["B"]
         if double:
-            up = self._get_col(U, 2);
-            down = self._get_col(D, 2)
-            front = self._get_col(F, 2);
-            back = self._get_col(B, 0)
-            self._set_col(U, 2, down)
-            self._set_col(D, 2, up)
-            self._set_col(F, 2, back[::-1])
-            self._set_col(B, 0, front[::-1])
+            up = self._get_column(U, 2);
+            down = self._get_column(D, 2)
+            front = self._get_column(F, 2);
+            back = self._get_column(B, 0)
+            self._set_column(U, 2, down)
+            self._set_column(D, 2, up)
+            self._set_column(F, 2, back[::-1])
+            self._set_column(B, 0, front[::-1])
         elif prime:
-            up = self._get_col(U, 2)
-            self._set_col(U, 2, self._get_col(F, 2))
-            self._set_col(F, 2, self._get_col(D, 2))
-            self._set_col(D, 2, self._get_col(B, 0)[::-1])
-            self._set_col(B, 0, up[::-1])
+            up = self._get_column(U, 2)
+            self._set_column(U, 2, self._get_column(F, 2))
+            self._set_column(F, 2, self._get_column(D, 2))
+            self._set_column(D, 2, self._get_column(B, 0)[::-1])
+            self._set_column(B, 0, up[::-1])
         else:
-            up = self._get_col(U, 2)
-            self._set_col(U, 2, self._get_col(B, 0)[::-1])
-            self._set_col(B, 0, self._get_col(D, 2)[::-1])
-            self._set_col(D, 2, self._get_col(F, 2))
-            self._set_col(F, 2, up)
+            up = self._get_column(U, 2)
+            self._set_column(U, 2, self._get_column(B, 0)[::-1])
+            self._set_column(B, 0, self._get_column(D, 2)[::-1])
+            self._set_column(D, 2, self._get_column(F, 2))
+            self._set_column(F, 2, up)
 
     def _turn_L(self, prime: bool = False, double: bool = False) -> None:
         """
@@ -348,26 +348,26 @@ class RubiksCube:
 
         U, F, D, B = self.faces["U"], self.faces["F"], self.faces["D"], self.faces["B"]
         if double:
-            up = self._get_col(U, 0);
-            down = self._get_col(D, 0)
-            front = self._get_col(F, 0);
-            back = self._get_col(B, 2)
-            self._set_col(U, 0, down)
-            self._set_col(D, 0, up)
-            self._set_col(F, 0, back[::-1])
-            self._set_col(B, 2, front[::-1])
+            up = self._get_column(U, 0);
+            down = self._get_column(D, 0)
+            front = self._get_column(F, 0);
+            back = self._get_column(B, 2)
+            self._set_column(U, 0, down)
+            self._set_column(D, 0, up)
+            self._set_column(F, 0, back[::-1])
+            self._set_column(B, 2, front[::-1])
         elif prime:
-            up = self._get_col(U, 0)
-            self._set_col(U, 0, self._get_col(B, 2)[::-1])
-            self._set_col(B, 2, self._get_col(D, 0)[::-1])
-            self._set_col(D, 0, self._get_col(F, 0))
-            self._set_col(F, 0, up)
+            up = self._get_column(U, 0)
+            self._set_column(U, 0, self._get_column(B, 2)[::-1])
+            self._set_column(B, 2, self._get_column(D, 0)[::-1])
+            self._set_column(D, 0, self._get_column(F, 0))
+            self._set_column(F, 0, up)
         else:
-            up = self._get_col(U, 0)
-            self._set_col(U, 0, self._get_col(F, 0))
-            self._set_col(F, 0, self._get_col(D, 0))
-            self._set_col(D, 0, self._get_col(B, 2)[::-1])
-            self._set_col(B, 2, up[::-1])
+            up = self._get_column(U, 0)
+            self._set_column(U, 0, self._get_column(F, 0))
+            self._set_column(F, 0, self._get_column(D, 0))
+            self._set_column(D, 0, self._get_column(B, 2)[::-1])
+            self._set_column(B, 2, up[::-1])
 
     def _turn_F(self, prime: bool = False, double: bool = False) -> None:
         """
@@ -391,24 +391,24 @@ class RubiksCube:
         if double:
             up = U[2][:]
             down = D[0][:]
-            left = self._get_col(L, 2)
-            right = self._get_col(R, 0)
+            left = self._get_column(L, 2)
+            right = self._get_column(R, 0)
             U[2] = down[::-1]
             D[0] = up[::-1]
-            self._set_col(L, 2, right[::-1])
-            self._set_col(R, 0, left[::-1])
+            self._set_column(L, 2, right[::-1])
+            self._set_column(R, 0, left[::-1])
         elif prime:
             up = U[2][:]
-            self._set_col(R, 0, up)
-            D[0] = self._get_col(R, 0)[::-1]
-            self._set_col(L, 2, D[0])
-            U[2] = self._get_col(L, 2)[::-1]
+            self._set_column(R, 0, up)
+            D[0] = self._get_column(R, 0)[::-1]
+            self._set_column(L, 2, D[0])
+            U[2] = self._get_column(L, 2)[::-1]
         else:
             up = U[2][:]
-            U[2] = self._get_col(L, 2)[::-1]
-            self._set_col(L, 2, D[0])
-            D[0] = self._get_col(R, 0)[::-1]
-            self._set_col(R, 0, up)
+            U[2] = self._get_column(L, 2)[::-1]
+            self._set_column(L, 2, D[0])
+            D[0] = self._get_column(R, 0)[::-1]
+            self._set_column(R, 0, up)
 
     def _turn_B(self, prime: bool = False, double: bool = False) -> None:
         """
@@ -432,24 +432,24 @@ class RubiksCube:
         if double:
             up = U[0][:]
             down = D[2][:]
-            left = self._get_col(L, 0)
-            right = self._get_col(R, 2)
+            left = self._get_column(L, 0)
+            right = self._get_column(R, 2)
             U[0] = down[::-1]
             D[2] = up[::-1]
-            self._set_col(L, 0, right[::-1])
-            self._set_col(R, 2, left[::-1])
+            self._set_column(L, 0, right[::-1])
+            self._set_column(R, 2, left[::-1])
         elif prime:
             up = U[0][:]
-            U[0] = self._get_col(R, 2)
-            self._set_col(R, 2, D[2][::-1])
-            D[2] = self._get_col(L, 0)
-            self._set_col(L, 0, up[::-1])
+            U[0] = self._get_column(R, 2)
+            self._set_column(R, 2, D[2][::-1])
+            D[2] = self._get_column(L, 0)
+            self._set_column(L, 0, up[::-1])
         else:
             up = U[0][:]
-            U[0] = self._get_col(L, 0)[::-1]
-            self._set_col(L, 0, D[2])
-            D[2] = self._get_col(R, 2)[::-1]
-            self._set_col(R, 2, up)
+            U[0] = self._get_column(L, 0)[::-1]
+            self._set_column(L, 0, D[2])
+            D[2] = self._get_column(R, 2)[::-1]
+            self._set_column(R, 2, up)
 
     # ------------------------------------------------------------------ #
     # Slice turns
@@ -468,26 +468,26 @@ class RubiksCube:
         """
         U, F, D, B = self.faces["U"], self.faces["F"], self.faces["D"], self.faces["B"]
         if double:
-            up = self._get_col(U, 1);
-            down = self._get_col(D, 1)
-            front = self._get_col(F, 1);
-            back = self._get_col(B, 1)
-            self._set_col(U, 1, down)
-            self._set_col(D, 1, up)
-            self._set_col(F, 1, back[::-1])
-            self._set_col(B, 1, front[::-1])
+            up = self._get_column(U, 1);
+            down = self._get_column(D, 1)
+            front = self._get_column(F, 1);
+            back = self._get_column(B, 1)
+            self._set_column(U, 1, down)
+            self._set_column(D, 1, up)
+            self._set_column(F, 1, back[::-1])
+            self._set_column(B, 1, front[::-1])
         elif prime:
-            up = self._get_col(U, 1)
-            self._set_col(U, 1, self._get_col(B, 1)[::-1])
-            self._set_col(B, 1, self._get_col(D, 1)[::-1])
-            self._set_col(D, 1, self._get_col(F, 1))
-            self._set_col(F, 1, up)
+            up = self._get_column(U, 1)
+            self._set_column(U, 1, self._get_column(B, 1)[::-1])
+            self._set_column(B, 1, self._get_column(D, 1)[::-1])
+            self._set_column(D, 1, self._get_column(F, 1))
+            self._set_column(F, 1, up)
         else:
-            up = self._get_col(U, 1)
-            self._set_col(U, 1, self._get_col(F, 1))
-            self._set_col(F, 1, self._get_col(D, 1))
-            self._set_col(D, 1, self._get_col(B, 1)[::-1])
-            self._set_col(B, 1, up[::-1])
+            up = self._get_column(U, 1)
+            self._set_column(U, 1, self._get_column(F, 1))
+            self._set_column(F, 1, self._get_column(D, 1))
+            self._set_column(D, 1, self._get_column(B, 1)[::-1])
+            self._set_column(B, 1, up[::-1])
 
     def _turn_E(self, prime: bool = False, double: bool = False) -> None:
         """
@@ -524,24 +524,24 @@ class RubiksCube:
         if double:
             up = U[1][:]
             down = D[1][:]
-            left = self._get_col(L, 1)
-            right = self._get_col(R, 1)
+            left = self._get_column(L, 1)
+            right = self._get_column(R, 1)
             U[1] = down[::-1]
             D[1] = up[::-1]
-            self._set_col(L, 1, right[::-1])
-            self._set_col(R, 1, left[::-1])
+            self._set_column(L, 1, right[::-1])
+            self._set_column(R, 1, left[::-1])
         elif prime:
             up = U[1][:]
-            self._set_col(R, 1, up)
-            D[1] = self._get_col(R, 1)[::-1]
-            self._set_col(L, 1, D[1])
-            U[1] = self._get_col(L, 1)[::-1]
+            self._set_column(R, 1, up)
+            D[1] = self._get_column(R, 1)[::-1]
+            self._set_column(L, 1, D[1])
+            U[1] = self._get_column(L, 1)[::-1]
         else:
             up = U[1][:]
-            U[1] = self._get_col(L, 1)[::-1]
-            self._set_col(L, 1, D[1])
-            D[1] = self._get_col(R, 1)[::-1]
-            self._set_col(R, 1, up)
+            U[1] = self._get_column(L, 1)[::-1]
+            self._set_column(L, 1, D[1])
+            D[1] = self._get_column(R, 1)[::-1]
+            self._set_column(R, 1, up)
 
     # ------------------------------------------------------------------ #
     # Public API: parsing + execution
