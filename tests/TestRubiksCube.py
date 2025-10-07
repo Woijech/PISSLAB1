@@ -228,17 +228,17 @@ class TestRubiksCube(unittest.TestCase):
         expected_180 = [['9', '8', '7'], ['6', '5', '4'], ['3', '2', '1']]
         self.assertEqual(rotated_180, expected_180)
 
-    def test_get_col_returns_correct_column_values(self):
+    def test_get_column_returns_correct_column_values(self):
         cube = RubiksCube()
         test_face = [['1', '2', '3'], ['4', '5', '6'], ['7', '8', '9']]
-        col = cube._get_col(test_face, 1)
+        col = cube._get_column(test_face, 1)
         expected_col = ['2', '5', '8']
         self.assertEqual(col, expected_col)
 
-    def test_set_col_replaces_column_in_place(self):
+    def test_set_column_replaces_column_in_place(self):
         cube = RubiksCube()
         test_face = [['1', '2', '3'], ['4', '5', '6'], ['7', '8', '9']]
-        cube._set_col(test_face, 1, ['a', 'b', 'c'])
+        cube._set_column(test_face, 1, ['a', 'b', 'c'])
         expected_face = [['1', 'a', '3'], ['4', 'b', '6'], ['7', 'c', '9']]
         self.assertEqual(test_face, expected_face)
 
