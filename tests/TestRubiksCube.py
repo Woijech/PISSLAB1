@@ -228,17 +228,17 @@ class TestRubiksCube(unittest.TestCase):
         expected_180 = [['9', '8', '7'], ['6', '5', '4'], ['3', '2', '1']]
         self.assertEqual(rotated_180, expected_180)
 
-    def test_get_col_returns_correct_column_values(self):
+    def test_get_column_returns_correct_column_values(self):
         cube = RubiksCube()
         test_face = [['1', '2', '3'], ['4', '5', '6'], ['7', '8', '9']]
-        col = cube._get_col(test_face, 1)
+        col = cube._get_column(test_face, 1)
         expected_col = ['2', '5', '8']
         self.assertEqual(col, expected_col)
 
-    def test_set_col_replaces_column_in_place(self):
+    def test_set_column_replaces_column_in_place(self):
         cube = RubiksCube()
         test_face = [['1', '2', '3'], ['4', '5', '6'], ['7', '8', '9']]
-        cube._set_col(test_face, 1, ['a', 'b', 'c'])
+        cube._set_column(test_face, 1, ['a', 'b', 'c'])
         expected_face = [['1', 'a', '3'], ['4', 'b', '6'], ['7', 'c', '9']]
         self.assertEqual(test_face, expected_face)
 
@@ -321,6 +321,50 @@ class TestRubiksCube(unittest.TestCase):
         self.assertTrue(callable(cube.apply))
         self.assertTrue(callable(cube.reset))
         self.assertTrue(callable(cube.is_solved))
+
+    # --- Additional coverage tests for uncovered lines ---
+    def test_parse_move_with_empty_string_returns_empty_tuple(self):
+        cube = RubiksCube()
+        base, suffix = cube._parse_move("")
+        self.assertEqual(base, "")
+        self.assertEqual(suffix, "")
+
+    def test_parse_move_without_modifier_returns_base_only(self):
+        cube = RubiksCube()
+        base, suffix = cube._parse_move("R")
+        self.assertEqual(base, "R")
+        self.assertEqual(suffix, "")
+
+    def test_turn_with_empty_move_string_does_nothing(self):
+        cube = RubiksCube()
+        initial_state = str(cube)
+        cube.turn("")
+        self.assertEqual(str(cube), initial_state)
+        self.assertTrue(cube.is_solved())
+
+    def test_load_invalid_file_format_raises_valueerror(self):
+        cube = RubiksCube()
+        with tempfile.NamedTemporaryFile(mode='w', delete=False, suffix='.txt') as f:
+            f.write("invalid\n")
+            temp_path = f.name
+        
+        try:
+            with self.assertRaises(ValueError) as context:
+                cube.load(temp_path)
+            self.assertIn("Invalid file format", str(context.exception))
+        finally:
+            if os.path.exists(temp_path):
+                os.unlink(temp_path)
+
+    def test_S_slice_turn_prime_modifier_changes_cube_state(self):
+        cube = RubiksCube()
+        cube.apply("S'")
+        self.assertFalse(cube.is_solved())
+
+    def test_S_slice_four_times_restores_solved_state(self):
+        cube = RubiksCube()
+        cube.apply("S S S S")
+        self.assertTrue(cube.is_solved())
 
 
 if __name__ == "__main__":

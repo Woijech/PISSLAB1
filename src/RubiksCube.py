@@ -122,8 +122,8 @@ class RubiksCube:
         Returns:
             None
         """
-        for r, v in enumerate(col):
-            face[r][j] = v
+        for r, v in enumerate(column_values):
+            face[r][col_index] = v
 
     @staticmethod
     def _parse_move(token: str) -> Tuple[str, str]:
@@ -225,7 +225,7 @@ class RubiksCube:
             c = face[0][0]
             for row_index in range(3):
                 for j in range(3):
-                    if face[r][j] != c:
+                    if face[row_index][j] != c:
                         return False
         return True
 
